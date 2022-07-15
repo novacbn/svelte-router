@@ -2,7 +2,7 @@
     "name": "@novacbn/svelte-router",
     "description": "Simple declarative clientside Svelte Router modeled on Web APIs and SvelteKit.",
     "author": "novacbn",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "module",
     "repository": {
         "type": "git",
