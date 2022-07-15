@@ -7,13 +7,13 @@
 <script lang="ts">
     import {Router} from "../lib";
 
-    import * as BasicRoute from "./_test/BasicRoute.svelte";
-    import * as ContextRoute from "./_test/ContextRoute.svelte";
-    import * as FetchRoute from "./_test/FetchRoute.svelte";
-    import * as NavigatingRoute from "./_test/NavigatingRoute.svelte";
-    import * as QueryParamsRoute from "./_test/QueryParamsRoute.svelte";
-    import * as RouteParamsRoute from "./_test/RouteParamsRoute.svelte";
-    import * as ServicesRoute from "./_test/ServicesRoute.svelte";
+    import * as BasicRoute from "./routes/BasicRoute.svelte";
+    import * as ContextRoute from "./routes/ContextRoute.svelte";
+    import * as FetchRoute from "./routes/FetchRoute.svelte";
+    import * as NavigatingRoute from "./routes/NavigatingRoute.svelte";
+    import * as QueryParamsRoute from "./routes/QueryParamsRoute.svelte";
+    import * as RouteParamsRoute from "./routes/RouteParamsRoute.svelte";
+    import * as ServicesRoute from "./routes/ServicesRoute.svelte";
 
     const SERVICES: IServices = {
         random: () => Math.random(),
