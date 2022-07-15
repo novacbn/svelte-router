@@ -1,0 +1,41 @@
+{
+    "name": "@novacbn/svelte-router",
+    "description": "Simple declarative clientside Svelte Router modeled on Web APIs and SvelteKit.",
+    "author": "novacbn",
+    "version": "0.0.1",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/novacbn/svelte-router"
+    },
+    "scripts": {
+        "build:app": "vite build",
+        "build:package": "svelte-kit package",
+        "dev:app": "vite dev",
+        "lint:package": "prettier --check --plugin-search-dir=. .",
+        "format:package": "prettier --write --plugin-search-dir=. .",
+        "preview:app": "vite preview",
+        "sync:svelte": "svelte-kit sync",
+        "test": "npm run test:types && npm run test:svelte && npm run test:e2e",
+        "test:e2e": "playwright test",
+        "test:svelte": "svelte-check --tsconfig ./tsconfig.json",
+        "test:types": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.23.3",
+        "@sveltejs/adapter-static": "^1.0.0-next.36",
+        "@sveltejs/kit": "^1.0.0-next.372",
+        "prettier": "^2.7.1",
+        "prettier-plugin-svelte": "^2.7.0",
+        "svelte-check": "^2.8.0",
+        "svelte-preprocess": "^4.10.7",
+        "svelte2tsx": "^0.5.11",
+        "tslib": "^2.4.0",
+        "typescript": "^4.7.4",
+        "vite": "^2.9.14"
+    },
+    "dependencies": {
+        "svelte": "^3.49.0",
+        "urlpattern-polyfill": "^5.0.3"
+    }
+}
