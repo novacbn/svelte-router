@@ -8,6 +8,14 @@ test("BasicRoute", async ({page}) => {
     expect(content).toBe("this is a basic route");
 });
 
+test("ContextRoute", async ({page}) => {
+    await page.goto("/#fetch");
+    await page.waitForSelector("#content");
+
+    const content = (await page.textContent("#content"))?.trim();
+    expect(content).toBe("Hello, Playwright!");
+});
+
 test("Fallback", async ({page}) => {
     await page.goto("/#fallback");
 
