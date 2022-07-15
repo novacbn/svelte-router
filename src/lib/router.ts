@@ -25,6 +25,8 @@ export interface IRouteDefinition<
 }
 
 export interface IRouterHandle {
+    navigate(href: string): void;
+
     navigating: INavigatingStore;
 
     router: IRouterStore;
@@ -124,6 +126,10 @@ export function router(options: IRouterOptions): IRouterHandle {
     );
 
     return {
+        navigate(href) {
+            url.navigate(href);
+        },
+
         navigating: {subscribe: navigating.subscribe},
         router,
     };
