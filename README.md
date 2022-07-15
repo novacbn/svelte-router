@@ -159,6 +159,51 @@ Configures the required Svelte Contexts for all other children `<Router.*>` Comp
 
 ### `Router.Route`
 
+Renders the provided route definition whenever it's active.
+
+```typescript
+export interface IRouteDefinition {
+    /**
+     * Represents the Svelte Component that renders whenever the route is active
+     */
+    default: typeof SvelteComponent;
+
+    /**
+     * Represents an optional callback used to fetch prerequisite data before rendering the route.
+     */
+    load?: ILoadCallback;
+
+    /**
+     * Represents pathname URL patterns to match against the hash fragment.
+     *
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
+     */
+    pattern: string | string[];
+}
+
+export interface $$Props {
+    /**
+     * Represents the definition of the route being added.
+     */
+    definition: IRouteDefinition;
+}
+```
+
+**Main.svelte**
+
+<!-- prettier-ignore -->
+```html
+<script>
+    import {Router} from "@novacbn/svelte-router";
+
+    import * as MyRoute from "./MyRoute.svelte";
+</script>
+
+<Router.Provider>
+    <Router.Route definition={MyRoute} />
+</Router.Provider>
+```
+
 ### `ILoadCallback`
 
 ```typescript
