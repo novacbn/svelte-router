@@ -1,10 +1,12 @@
 import type {SvelteComponent} from "svelte";
 import type {Readable} from "svelte/store";
-import {derived, writable} from "svelte/store";
+import {derived, get, writable} from "svelte/store";
 
-import type {IHashResult, IHashStore} from "./hash";
-import {hash as make_hash_store} from "./hash";
+import type {IMatcherResult, IMatcherStore} from "./matcher";
+import {matcher as make_matcher_store} from "./matcher";
 import type {IContext, ILoadCallback, ILoadOutput, IProps, IServices} from "./load";
+import type {IURLStore} from "./url";
+import {hash as make_hash_store} from "./url";
 
 export type INavigatingStore = Readable<boolean>;
 
@@ -23,6 +25,8 @@ export interface IRouteDefinition<
 }
 
 export interface IRouterHandle {
+    navigate(href: string): void;
+
     navigating: INavigatingStore;
 
     router: IRouterStore;
@@ -31,6 +35,8 @@ export interface IRouterOptions {
     routes: IRouteDefinition[];
 
     services?: IServices;
+
+    url?: IURLStore;
 }
 
 export interface IRouterResult {
@@ -43,13 +49,26 @@ export interface IRouterResult {
     props?: IProps;
 }
 
+function can_clone(value: any): boolean {
+    try {
+        structuredClone(value);
+    } catch (err) {
+        return false;
+    }
+
+    return true;
+}
+
 export function router(options: IRouterOptions): IRouterHandle {
-    const {routes, services} = options;
+    const {routes, services, url: option_url} = options;
 
     let nonce: any = null;
 
     const navigating = writable<boolean>(false);
-    const hash = make_hash_store<IRouteDefinition>(
+    const url = option_url ?? make_hash_store();
+
+    const matcher = make_matcher_store<IRouteDefinition>(
+        url,
         Object.fromEntries(
             routes
                 .map((route) => {
@@ -63,7 +82,7 @@ export function router(options: IRouterOptions): IRouterHandle {
     );
 
     async function get_route(
-        $hash: IHashResult<IRouteDefinition>,
+        $hash: IMatcherResult<IRouteDefinition>,
         set: (value: IRouterResult) => void
     ): Promise<void> {
         navigating.set(true);
@@ -75,20 +94,26 @@ export function router(options: IRouterOptions): IRouterHandle {
         let output: ILoadOutput<IContext, IProps> | void;
 
         if (load) {
-            const url = new URL(location.hash.slice(1) || "/", location.origin);
+            const $url = get(url);
 
-            output = await load({
-                pattern,
-                // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
-                services,
-                url,
-            });
+            output =
+                url.state() ??
+                (await load({
+                    pattern,
+                    // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
+                    services,
+                    url: new URL($url, location.origin),
+                }));
 
             if (nonce !== current_nonce) return;
 
-            if (output && output.redirect) {
-                location.hash = output.redirect;
-                return;
+            if (output) {
+                if (can_clone(output)) url.update(output);
+
+                if (output.redirect) {
+                    url.navigate(output.redirect);
+                    return;
+                }
             }
         }
 
@@ -103,8 +128,8 @@ export function router(options: IRouterOptions): IRouterHandle {
         navigating.set(false);
     }
 
-    const router = derived<IHashStore<IRouteDefinition>, IRouterResult | null>(
-        hash,
+    const router = derived<IMatcherStore<IRouteDefinition>, IRouterResult | null>(
+        matcher,
         ($hash, set) => {
             nonce = {};
 
@@ -117,6 +142,10 @@ export function router(options: IRouterOptions): IRouterHandle {
     );
 
     return {
+        navigate(href) {
+            url.navigate(href);
+        },
+
         navigating: {subscribe: navigating.subscribe},
         router,
     };

@@ -120,6 +120,11 @@ interface $$Props {
      * Represents an optional cache of values that can be utilized by a `load` function
      */
     services?: Record<string, any>;
+
+    /**
+     * Represents an optional custom Svelte Store which spits out `URL` objects to source location data from
+     */
+    url?: IURLStore;
 }
 ```
 
@@ -273,4 +278,38 @@ Represents a `load` function with its inputs and outputs.
         };
     });
 </script>
+```
+
+### `hash`
+
+Represents a Svelte Store that bases its `URL` object output on the Browser's current hash fragment.
+
+<!-- prettier-ignore -->
+```html
+<script>
+    import {Router, hash} from "@novacbn/router";
+
+    const store = hash();
+</script>
+
+<Router.Provider url={store}>
+    ...
+</Router.Provider>
+```
+
+### `location`
+
+Represents a Svelte Store that bases its `URL` object output on the Browser's current URL bar.
+
+<!-- prettier-ignore -->
+```html
+<script>
+    import {Router, location} from "@novacbn/router";
+
+    const store = location();
+</script>
+
+<Router.Provider url={store}>
+    ...
+</Router.Provider>
 ```

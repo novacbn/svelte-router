@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
     import {define_load} from "../../lib";
 
-    import type {IServices} from "../index.svelte";
+    import type {IServices} from "../Main.svelte";
 
     export const pattern = "/services";
 
