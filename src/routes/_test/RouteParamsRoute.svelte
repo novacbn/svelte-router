@@ -7,7 +7,7 @@
         message: string;
     }
 
-    export const load = define_load<never, IProps>(({pattern}) => {
+    export const load = define_load<undefined, undefined, IProps>(({pattern}) => {
         const {message = "N/A"} = pattern.pathname.groups;
 
         return {

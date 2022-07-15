@@ -7,7 +7,7 @@
         message: string;
     }
 
-    export const load = define_load<never, IProps>(({url}) => {
+    export const load = define_load<undefined, undefined, IProps>(({url}) => {
         const {message = "N/A"} = Object.fromEntries(url.searchParams.entries());
 
         return {

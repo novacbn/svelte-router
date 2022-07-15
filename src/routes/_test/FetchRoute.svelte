@@ -11,7 +11,7 @@
         message: string;
     }
 
-    export const load = define_load<never, IProps>(async () => {
+    export const load = define_load<undefined, undefined, IProps>(async () => {
         const response = await fetch("/data.json");
         const data = (await response.json()) as IData;
 
