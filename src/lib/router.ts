@@ -34,7 +34,7 @@ export interface IRouterOptions {
 
     services?: IServices;
 
-    url?: () => IURLStore;
+    url?: IURLStore;
 }
 
 export interface IRouterResult {
@@ -48,12 +48,12 @@ export interface IRouterResult {
 }
 
 export function router(options: IRouterOptions): IRouterHandle {
-    const {routes, services, url: make_url_store = make_hash_store} = options;
+    const {routes, services, url: option_url} = options;
 
     let nonce: any = null;
 
     const navigating = writable<boolean>(false);
-    const url = make_url_store();
+    const url = option_url ?? make_hash_store();
 
     const matcher = make_matcher_store<IRouteDefinition>(
         url,

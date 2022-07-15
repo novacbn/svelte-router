@@ -21,6 +21,7 @@
                 make_router_handle({
                     routes: Array.from(definitions),
                     services,
+                    url,
                 })
             );
         },
@@ -32,6 +33,7 @@
                 make_router_handle({
                     routes: Array.from(definitions),
                     services,
+                    url,
                 })
             );
         },
