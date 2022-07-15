@@ -5,6 +5,8 @@
     import type {IServices} from "../load";
     import type {IRouteDefinition, IRouterHandle} from "../router";
     import {router as make_router_handle} from "../router";
+    import type {IURLStore} from "../url";
+    import {hash} from "../url";
 
     const definitions = new Set<IRouteDefinition>();
     const handle = writable<IRouterHandle>();
@@ -36,6 +38,7 @@
     });
 
     export let services: IServices | undefined = undefined;
+    export let url: IURLStore = hash();
 </script>
 
 <slot />
