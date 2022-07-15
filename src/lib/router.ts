@@ -49,6 +49,16 @@ export interface IRouterResult {
     props?: IProps;
 }
 
+function can_clone(value: any): boolean {
+    try {
+        structuredClone(value);
+    } catch (err) {
+        return false;
+    }
+
+    return true;
+}
+
 export function router(options: IRouterOptions): IRouterHandle {
     const {routes, services, url: option_url} = options;
 
@@ -86,18 +96,24 @@ export function router(options: IRouterOptions): IRouterHandle {
         if (load) {
             const $url = get(url);
 
-            output = await load({
-                pattern,
-                // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
-                services,
+            output =
+                url.state() ??
+                (await load({
+                    pattern,
+                    // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
+                    services,
                     url: new URL($url, location.origin),
-            });
+                }));
 
             if (nonce !== current_nonce) return;
 
-            if (output && output.redirect) {
-                location.hash = output.redirect;
-                return;
+            if (output) {
+                if (can_clone(output)) url.update(output);
+
+                if (output.redirect) {
+                    url.navigate(output.redirect);
+                    return;
+                }
             }
         }
 
