@@ -58,3 +58,11 @@ test("RouteParamsRoute", async ({page}) => {
     const content = (await page.textContent("#content"))?.trim();
     expect(content).toBe("Hello, Svelte!");
 });
+
+test("ServicesRoute", async ({page}) => {
+    await page.goto("/#/services");
+    await page.waitForSelector("#content");
+
+    const content = (await page.textContent("#content"))?.trim();
+    expect(content).toMatch(/the random value was: \d+\.\d+!/);
+});
