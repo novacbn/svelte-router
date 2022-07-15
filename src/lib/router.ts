@@ -2,9 +2,11 @@ import type {SvelteComponent} from "svelte";
 import type {Readable} from "svelte/store";
 import {derived, writable} from "svelte/store";
 
-import type {IHashResult, IHashStore} from "./hash";
-import {hash as make_hash_store} from "./hash";
+import type {IMatcherResult, IMatcherStore} from "./matcher";
+import {matcher as make_matcher_store} from "./matcher";
 import type {IContext, ILoadCallback, ILoadOutput, IProps, IServices} from "./load";
+import type {IURLStore} from "./url";
+import {hash as make_hash_store} from "./url";
 
 export type INavigatingStore = Readable<boolean>;
 
@@ -31,6 +33,8 @@ export interface IRouterOptions {
     routes: IRouteDefinition[];
 
     services?: IServices;
+
+    url?: () => IURLStore;
 }
 
 export interface IRouterResult {
@@ -44,12 +48,15 @@ export interface IRouterResult {
 }
 
 export function router(options: IRouterOptions): IRouterHandle {
-    const {routes, services} = options;
+    const {routes, services, url: make_url_store = make_hash_store} = options;
 
     let nonce: any = null;
 
     const navigating = writable<boolean>(false);
-    const hash = make_hash_store<IRouteDefinition>(
+    const url = make_url_store();
+
+    const matcher = make_matcher_store<IRouteDefinition>(
+        url,
         Object.fromEntries(
             routes
                 .map((route) => {
@@ -63,7 +70,7 @@ export function router(options: IRouterOptions): IRouterHandle {
     );
 
     async function get_route(
-        $hash: IHashResult<IRouteDefinition>,
+        $hash: IMatcherResult<IRouteDefinition>,
         set: (value: IRouterResult) => void
     ): Promise<void> {
         navigating.set(true);
@@ -103,8 +110,8 @@ export function router(options: IRouterOptions): IRouterHandle {
         navigating.set(false);
     }
 
-    const router = derived<IHashStore<IRouteDefinition>, IRouterResult | null>(
-        hash,
+    const router = derived<IMatcherStore<IRouteDefinition>, IRouterResult | null>(
+        matcher,
         ($hash, set) => {
             nonce = {};
 
