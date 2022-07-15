@@ -1,56 +1,23 @@
-import type {URLPatternResult} from "urlpattern-polyfill/dist/types";
-
 import type {SvelteComponent} from "svelte";
 import type {Readable} from "svelte/store";
 import {derived, writable} from "svelte/store";
 
 import type {IHashResult, IHashStore} from "./hash";
 import {hash as make_hash_store} from "./hash";
-
-export type IContext = Record<string, any>;
-
-export type IProps = Record<string, any>;
+import type {IContext, ILoadCallback, ILoadOutput, IProps, IServices} from "./load";
 
 export type INavigatingStore = Readable<boolean>;
 
 export type IRouterStore = Readable<IRouterResult | null>;
 
-interface ILoadContext<Context extends IContext> {
-    context: Context;
-}
-
-interface ILoadProps<Props extends IProps> {
-    props: Props;
-}
-
-interface ILoadUntypedInput {
-    pattern: URLPatternResult;
-
-    url: URL;
-}
-
-interface ILoadUntypedOutput {
-    redirect?: string;
-}
-
-export type ILoadCallback<Context extends IContext = any, Props extends IProps = any> = (
-    input: ILoadInput<Context>
-) => ILoadOutput<Context, Props> | void | Promise<ILoadOutput<Context, Props> | void>;
-
-export type ILoadInput<Context extends IContext = any> =
-    | ILoadUntypedInput
-    | (ILoadUntypedInput & ILoadContext<Context>);
-
-export type ILoadOutput<Context extends IContext = any, Props extends IProps = any> =
-    | ILoadUntypedOutput
-    | (ILoadUntypedOutput & ILoadContext<Context>)
-    | (ILoadUntypedOutput & ILoadProps<Props>)
-    | (ILoadUntypedOutput & ILoadContext<Context> & ILoadProps<Props>);
-
-export interface IRouteDefinition {
+export interface IRouteDefinition<
+    Services extends IServices | undefined = undefined,
+    Context extends IContext | undefined = undefined,
+    Props extends IContext | undefined = undefined
+> {
     default: typeof SvelteComponent;
 
-    load?: ILoadCallback;
+    load?: ILoadCallback<Services, Context, Props>;
 
     pattern: string | readonly string[];
 }
@@ -61,9 +28,9 @@ export interface IRouterHandle {
     router: IRouterStore;
 }
 export interface IRouterOptions {
-    context?: IContext;
-
     routes: IRouteDefinition[];
+
+    services?: IServices;
 }
 
 export interface IRouterResult {
@@ -77,7 +44,7 @@ export interface IRouterResult {
 }
 
 export function router(options: IRouterOptions): IRouterHandle {
-    const {context = {}, routes} = options;
+    const {routes, services} = options;
 
     let nonce: any = null;
 
@@ -104,12 +71,18 @@ export function router(options: IRouterOptions): IRouterHandle {
         const {pattern, result} = $hash;
         const current_nonce = nonce;
 
-        const load = result.load as ILoadCallback<IContext, IProps> | undefined;
+        const load = result.load as ILoadCallback<IServices, IContext, IProps> | undefined;
         let output: ILoadOutput<IContext, IProps> | void;
 
         if (load) {
             const url = new URL(location.hash.slice(1) || "/", location.origin);
-            output = await load({context, pattern, url});
+
+            output = await load({
+                pattern,
+                // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
+                services,
+                url,
+            });
 
             if (nonce !== current_nonce) return;
 
@@ -122,10 +95,8 @@ export function router(options: IRouterOptions): IRouterHandle {
         set({
             Component: result.default,
 
-            // @ts-expect-error
             context: output?.context,
             definition: $hash.result,
-            // @ts-expect-error
             props: output?.props,
         });
 

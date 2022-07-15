@@ -2,7 +2,8 @@
     import {writable} from "svelte/store";
 
     import {CONTEXT_PROVIDER} from "../context";
-    import type {IContext, IRouteDefinition, IRouterHandle} from "../router";
+    import type {IServices} from "../load";
+    import type {IRouteDefinition, IRouterHandle} from "../router";
     import {router as make_router_handle} from "../router";
 
     const definitions = new Set<IRouteDefinition>();
@@ -16,8 +17,8 @@
 
             handle.set(
                 make_router_handle({
-                    context,
                     routes: Array.from(definitions),
+                    services,
                 })
             );
         },
@@ -27,14 +28,14 @@
 
             handle.set(
                 make_router_handle({
-                    context,
                     routes: Array.from(definitions),
+                    services,
                 })
             );
         },
     });
 
-    export let context: IContext | undefined = undefined;
+    export let services: IServices | undefined = undefined;
 </script>
 
 <slot />
