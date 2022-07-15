@@ -4,6 +4,8 @@ import {readable} from "svelte/store";
 export interface IURLStore extends Readable<URL> {
     navigate<T = any>(href: string, state?: T): void;
 
+    state<T>(): T;
+
     update<T = any>(state?: T): void;
 }
 
@@ -43,6 +45,10 @@ export function hash(): IURLStore {
             window.dispatchEvent(new PopStateEvent("popstate"));
         },
 
+        state() {
+            return history.state;
+        },
+
         subscribe,
 
         update(state = undefined) {
@@ -79,6 +85,10 @@ export function location(): IURLStore {
             const {hash, pathname, search} = new URL(href, origin);
 
             history.pushState(state, "", `${origin}/${pathname.slice(1)}${search}${hash}`);
+        },
+
+        state() {
+            return history.state;
         },
 
         subscribe,
