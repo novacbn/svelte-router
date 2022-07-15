@@ -119,11 +119,11 @@ interface $$Props {
     /**
      * Represents an optional cache of values that can be utilized by a `load` function
      */
-    context?: Record<string, any>;
+    services?: Record<string, any>;
 }
 ```
 
-Configures the required Svelte Contexts for all other children `<Router.*>` Components can function. Along with holding a context for passing into child `load` functions.
+Configures the required Svelte Contexts for all other children `<Router.*>` Components can function. Along with holding a services cache for passing into child `load` functions.
 
 **Main.svelte**
 
@@ -134,12 +134,12 @@ Configures the required Svelte Contexts for all other children `<Router.*>` Comp
 
     import * as MyRoute from "./MyRoute.svelte";
 
-    const my_context = {
+    const my_services = {
         my_value: true
     }
 </script>
 
-<Router.Provider context={my_context}>
+<Router.Provider services={my_services}>
     ...
 </Router.Provider>
 ```
@@ -151,8 +151,8 @@ Configures the required Svelte Contexts for all other children `<Router.*>` Comp
 <script context="module">
     import {define_load} from "@novacbn/svelte-router";
 
-    export const load = define_load(({context}) => {
-        const value = context.my_value;
+    export const load = define_load(({services}) => {
+        const value = services.my_value;
     });
 </script>
 ```
@@ -209,16 +209,16 @@ export interface $$Props {
 ```typescript
 export interface ILoadInput {
     /**
-     * Represents the context supplied in `<Route.Provider context={...}>`, only available if supplied.
-     */
-    context?: Record<string, any>;
-
-    /**
      * Represents the matched route parameters defined in the exported `pattern`.
      *
      * See: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern/exec
      */
     pattern: URLPatternResult;
+
+    /**
+     * Represents the values supplied in `<Route.Provider services={...}>`, only available if supplied.
+     */
+    services?: Record<string, any>;
 
     /**
      * Represents the matched URL components.
@@ -258,7 +258,7 @@ Represents a `load` function with its inputs and outputs.
     import {define_load} from "@novacbn/svelte-router";
 
     export const load = define_load((input) => {
-        const {context, pattern, url} = input;
+        const {pattern, services, url} = input;
 
         return {
             context: {
