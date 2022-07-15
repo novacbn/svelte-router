@@ -9,7 +9,7 @@ test("BasicRoute", async ({page}) => {
 });
 
 test("ContextRoute", async ({page}) => {
-    await page.goto("/#fetch");
+    await page.goto("/#context");
     await page.waitForSelector("#content");
 
     const content = (await page.textContent("#content"))?.trim();
