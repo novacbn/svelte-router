@@ -6,7 +6,7 @@
 
     const {handle, register, unregister} = CONTEXT_PROVIDER.get();
 
-    export let definition: IRouteDefinition;
+    export let definition: IRouteDefinition<any, any, any>;
 
     register(definition);
 
