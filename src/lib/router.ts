@@ -90,7 +90,7 @@ export function router(options: IRouterOptions): IRouterHandle {
                 pattern,
                 // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
                 services,
-                url: $url,
+                    url: new URL($url, location.origin),
             });
 
             if (nonce !== current_nonce) return;

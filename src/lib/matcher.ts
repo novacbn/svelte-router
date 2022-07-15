@@ -26,7 +26,7 @@ export function matcher<T>(
     });
 
     return derived(store, ($store) => {
-        const {pathname} = $store;
+        const {pathname} = new URL($store, location.origin);
 
         for (const route of mapped_routes) {
             const [pattern, result] = route;

@@ -1,26 +1,33 @@
 import type {Readable} from "svelte/store";
 import {readable} from "svelte/store";
 
-export interface IURLStore extends Readable<URL> {
+export interface IURLStore extends Readable<string> {
     navigate<T = any>(href: string, state?: T): void;
 
-    state<T>(): T;
+    state<T = any>(): T | undefined;
 
     update<T = any>(state?: T): void;
 }
 
-function get_hash_url(): URL {
-    return new URL(window.location.hash.slice(1) || "/", window.location.origin);
+function get_hash_href(): string {
+    const {hash, pathname, search} = new URL(
+        window.location.hash.slice(1) || "/",
+        window.location.origin
+    );
+
+    return `${pathname}${search}${hash}`;
 }
 
-function get_location_url(): URL {
-    return new URL(window.location.href);
+function get_location_href(): string {
+    const {hash, pathname, search} = new URL(window.location.href);
+
+    return `${pathname}${search}${hash}`;
 }
 
 export function hash(): IURLStore {
-    const {subscribe} = readable<URL>(get_hash_url(), (set) => {
+    const {subscribe} = readable(get_hash_href(), (set) => {
         function on_pop_state(): void {
-            const url = get_hash_url();
+            const url = get_hash_href();
 
             set(url);
         }
@@ -66,11 +73,11 @@ export function hash(): IURLStore {
 }
 
 export function location(): IURLStore {
-    const {subscribe} = readable<URL>(get_location_url(), (set) => {
+    const {subscribe} = readable(get_location_href(), (set) => {
         function on_popstate(): void {
-            const url = get_location_url();
+            const href = get_location_href();
 
-            set(url);
+            set(href);
         }
 
         on_popstate();
