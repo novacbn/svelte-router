@@ -45,7 +45,7 @@ npm install @novacbn/svelte-router
 
     // NOTE: Usage of `define_load` is /not required/, but helps provide typing awareness to your IDE
     export const load = define_load(async ({pattern}) => {
-        const file = pattern.pathname.groups;
+        const {file} = pattern.pathname.groups;
 
         const response = await fetch(`${file}.json`);
         const data = await response.json();
