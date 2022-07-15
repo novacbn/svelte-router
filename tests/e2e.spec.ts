@@ -8,6 +8,14 @@ test("BasicRoute", async ({page}) => {
     expect(content).toBe("this is a basic route");
 });
 
+test("ContextRoute", async ({page}) => {
+    await page.goto("/#context");
+    await page.waitForSelector("#content");
+
+    const content = (await page.textContent("#content"))?.trim();
+    expect(content).toBe("Hello, Playwright!");
+});
+
 test("Fallback", async ({page}) => {
     await page.goto("/#fallback");
 
@@ -49,4 +57,12 @@ test("RouteParamsRoute", async ({page}) => {
 
     const content = (await page.textContent("#content"))?.trim();
     expect(content).toBe("Hello, Svelte!");
+});
+
+test("ServicesRoute", async ({page}) => {
+    await page.goto("/#/services");
+    await page.waitForSelector("#content");
+
+    const content = (await page.textContent("#content"))?.trim();
+    expect(content).toMatch(/the random value was: \d+\.\d+!/);
 });
