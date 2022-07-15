@@ -1,6 +1,6 @@
 import type {SvelteComponent} from "svelte";
 import type {Readable} from "svelte/store";
-import {derived, writable} from "svelte/store";
+import {derived, get, writable} from "svelte/store";
 
 import type {IMatcherResult, IMatcherStore} from "./matcher";
 import {matcher as make_matcher_store} from "./matcher";
@@ -84,13 +84,13 @@ export function router(options: IRouterOptions): IRouterHandle {
         let output: ILoadOutput<IContext, IProps> | void;
 
         if (load) {
-            const url = new URL(location.hash.slice(1) || "/", location.origin);
+            const $url = get(url);
 
             output = await load({
                 pattern,
                 // @ts-expect-error: HACK: if they're not provided, the route `load` functions should /not/ be consuming /anyway/
                 services,
-                url,
+                url: $url,
             });
 
             if (nonce !== current_nonce) return;
